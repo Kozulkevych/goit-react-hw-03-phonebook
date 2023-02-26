@@ -7,11 +7,25 @@ import data from '../data/data';
 import { TitlePrimary, TitleSecondary, Text } from './App.styled';
 import Box from './Box/Box';
 
+const CONTACTS_KEY = 'contacts';
 export class App extends Component {
   state = {
     contacts: data,
     filter: '',
   };
+
+  componentDidMount() {
+    const localData = localStorage.getItem(CONTACTS_KEY);
+    if (localData) {
+      this.setState({ contacts: JSON.parsel(localData) });
+    }
+  }
+
+  componentDidUpdate(_, prevState) {
+    if (this.state.contacts!== prevState.contacts) {
+      localStorage.setItem(CONTACTS_KEY, JSON.stringify(this.state.contacts));
+    }
+  }
 
   onSubmit = ({ name, number }) => {
     const id = nanoid();
@@ -69,7 +83,9 @@ export class App extends Component {
           as="section"
         >
           <TitlePrimary>PHONEBOOK</TitlePrimary>
-          <FormContact onSubmit={this.onSubmit} />
+          <Box p={4} border="normal" borderRadius="normal">
+            <FormContact onSubmit={this.onSubmit} />
+          </Box>
 
           <TitleSecondary>Contacts</TitleSecondary>
           <FilterContacts value={filter} onChange={this.changeFilter} />
